@@ -15,7 +15,7 @@ Everything lies within the framework of multilinear algebra and here you can fin
 
 ### 2. **Definition of Representations**
    - Product representation $\rho = \bigotimes_{i=1}^{k} (\rho^{j_i})$ identifying the lattice.
-   - Use of the theorem $\rho^{j} = \text{Sym}^{2j}$, being $\text{Sym}^k:=\odot_{i=1}^k\rho^{1/2}:SU(2)\to\GL(\C^{k+1})$.
+   - Use of the theorem $\rho^{j} = \text{Sym}^{2j}$, being $\text{Sym}^k:=\bigodot_{i=1}^k\rho^{1/2}:\text{SU}(2)\to\text{GL}(\mathbb{C}^{k+1})$.
 
 ### 3. **Lie Operators**
    - **Construction**: Utilizing the Pauli matrices $\sigma_a$ and defining $\tau_a = -\frac{i}{2} \sigma_a$.
