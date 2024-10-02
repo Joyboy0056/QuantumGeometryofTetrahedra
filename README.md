@@ -11,7 +11,7 @@ Everything lies within the framework of multilinear algebra and here you can fin
 ### 1. **Theoretical Context**
    - **Quantum Theory**: Gravitational field with gauge symmetries $\text{SU}(2)$ and diffeomorphisms.
    - **Dynamic Variable**: Discretized connection on a lattice $\Gamma$ with  N nodes and L links, mapped to $\text{SU}(2)^L$.
-   - **Quantum States**: Functionals of discrete connections, expressed in the Peter-Weyl product basis in terms of the fundamental representation $\rho^{1/2}$ of \text{SU}(2).
+   - **Quantum States**: Functionals of discrete connections, expressed in the Peter-Weyl product basis in terms of the fundamental representation $\rho^{1/2}$ of $\text{SU}(2)$.
 
 ### 2. **Definition of Representations**
    - Product representation $\rho = \bigotimes_{i=1}^{k} (\rho^{j_i})$ identifying the lattice.
