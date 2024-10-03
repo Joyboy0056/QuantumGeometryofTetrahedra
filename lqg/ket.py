@@ -1,5 +1,6 @@
 import sympy as sp
 import itertools
+from collections import defaultdict
 
 class Ket2D:
     def __init__(self):
@@ -33,10 +34,6 @@ class Ket2D:
 
         return " + ".join(contraction_terms)
 
-
-import sympy as sp
-import itertools
-from collections import defaultdict
 
 
 class Ket3D:
