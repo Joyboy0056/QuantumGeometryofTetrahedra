@@ -36,4 +36,4 @@ Everything lies within the framework of multilinear algebra and here you can fin
    - **Develop** a program to calculate gauge invariant operators and Lie operators in a multilinear algebra context.
 
 ## Fruibility
-You can mainly refer to the folder [lqg](https://github.com/Joyboy0056/QuantumGeometryofTetrahedra/tree/main/lqg), that's where you can find a comprehensible workflow of the theory of quantum spin $(j,j,j,j)$ tetrahedra. In particular, there you will spot my libraries on Kets and Quantum Operators both for the case $j=\frac{1}{2}$ and $j=1$.
+You can mainly refer to the folder [lqg](https://github.com/Joyboy0056/QuantumGeometryofTetrahedra/tree/main/lqg), that's where you can find a comprehensible workflow of the theory of quantum spin $(j,j,j,j)$ tetrahedra. In particular, there you will spot my libraries on Kets and Quantum Operators for both the cases $j=\frac{1}{2}$ and $j=1$.
