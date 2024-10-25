@@ -21,11 +21,13 @@ basis_vectors = [(e1, e1, e1, e1), (e1, e1, e1, e2), (e1, e1, e2, e1), (e1, e1, 
                  (e2, e1, e1, e1), (e2, e1, e1, e2), (e2, e1, e2, e1), (e2, e1, e2, e2),
                  (e2, e2, e1, e1), (e2, e2, e1, e2), (e2, e2, e2, e1), (e2, e2, e2, e2)]
 
-# Compute the 16 canonical basis vectors of C^2\otimes4
-vectors = [kronecker_product_4(*vectors) for vectors in basis_vectors]
-
 #ALTERNATIVELY, we can use a generalized method based on the following function
 from itertools import product
+
+basis_vectors = list(product((e1, e2), repeat = 4))
+
+# Compute the 16 canonical basis vectors of C^2\otimes4
+vectors = [kronecker_product_4(*vectors) for vectors in basis_vectors]
 
 def generate_combinations(elements, n):
     """
