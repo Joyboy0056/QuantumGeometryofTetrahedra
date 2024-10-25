@@ -2,6 +2,7 @@
 # which corresponds to the spin network described by the representation {rho^1}^{\otimes4}
 
 import numpy as np
+import itertools
 
 from LieOperators import lie_operator, squared_lie_operator, kronecker_product_4, print_matrix
 
@@ -14,34 +15,35 @@ e2 = np.array([0, 1, 0])
 e3 = np.array([0, 0, 1])
 
 # now compute the 3^4=81 vectors spanning {C^3}^{\otimes4}
+#basis_vectors = [(e1, e1, e1, e1), (e1, e1, e1, e2), (e1, e1, e1, e3),
+ #                (e1, e1, e2, e1), (e1, e1, e2, e2), (e1, e1, e2, e3),
+  #               (e1, e1, e3, e1), (e1, e1, e3, e2), (e1, e1, e3, e3),
+   #              (e1, e2, e1, e1), (e1, e2, e1, e2), (e1, e2, e1, e3),
+    #             (e1, e2, e2, e1), (e1, e2, e2, e2), (e1, e2, e2, e3),
+     #            (e1, e2, e3, e1), (e1, e2, e3, e2), (e1, e2, e3, e3),
+      #           (e1, e3, e1, e1), (e1, e3, e1, e2), (e1, e3, e1, e3),
+       #          (e1, e3, e2, e1), (e1, e3, e2, e2), (e1, e3, e2, e3),
+        #         (e1, e3, e3, e1), (e1, e3, e3, e2), (e1, e3, e3, e3),
+         #        (e2, e1, e1, e1), (e2, e1, e1, e2), (e2, e1, e1, e3),
+          #       (e2, e1, e2, e1), (e2, e1, e2, e2), (e2, e1, e2, e3),
+           #      (e2, e1, e3, e1), (e2, e1, e3, e2), (e2, e1, e3, e3),
+            #     (e2, e2, e1, e1), (e2, e2, e1, e2), (e2, e2, e1, e3),
+             #    (e2, e2, e2, e1), (e2, e2, e2, e2), (e2, e2, e2, e3),
+              #   (e2, e2, e3, e1), (e2, e2, e3, e2), (e2, e2, e3, e3),
+               #  (e2, e3, e1, e1), (e2, e3, e1, e2), (e2, e3, e1, e3),
+                # (e2, e3, e2, e1), (e2, e3, e2, e2), (e2, e3, e2, e3),
+                 #(e2, e3, e3, e1), (e2, e3, e3, e2), (e2, e3, e3, e3),
+                 #(e3, e1, e1, e1), (e3, e1, e1, e2), (e3, e1, e1, e3),
+                 #(e3, e1, e2, e1), (e3, e1, e2, e2), (e3, e1, e2, e3),
+                 #(e3, e1, e3, e1), (e3, e1, e3, e2), (e3, e1, e3, e3),
+                # (e3, e2, e1, e1), (e3, e2, e1, e2), (e3, e2, e1, e3),
+               #  (e3, e2, e2, e1), (e3, e2, e2, e2), (e3, e2, e2, e3),
+              #   (e3, e2, e3, e1), (e3, e2, e3, e2), (e3, e2, e3, e3),
+             #    (e3, e3, e1, e1), (e3, e3, e1, e2), (e3, e3, e1, e3),
+            #     (e3, e3, e2, e1), (e3, e3, e2, e2), (e3, e3, e2, e3),
+           #      (e3, e3, e3, e1), (e3, e3, e3, e2), (e3, e3, e3, e3)]
 
-basis_vectors = [(e1, e1, e1, e1), (e1, e1, e1, e2), (e1, e1, e1, e3),
-                 (e1, e1, e2, e1), (e1, e1, e2, e2), (e1, e1, e2, e3),
-                 (e1, e1, e3, e1), (e1, e1, e3, e2), (e1, e1, e3, e3),
-                 (e1, e2, e1, e1), (e1, e2, e1, e2), (e1, e2, e1, e3),
-                 (e1, e2, e2, e1), (e1, e2, e2, e2), (e1, e2, e2, e3),
-                 (e1, e2, e3, e1), (e1, e2, e3, e2), (e1, e2, e3, e3),
-                 (e1, e3, e1, e1), (e1, e3, e1, e2), (e1, e3, e1, e3),
-                 (e1, e3, e2, e1), (e1, e3, e2, e2), (e1, e3, e2, e3),
-                 (e1, e3, e3, e1), (e1, e3, e3, e2), (e1, e3, e3, e3),
-                 (e2, e1, e1, e1), (e2, e1, e1, e2), (e2, e1, e1, e3),
-                 (e2, e1, e2, e1), (e2, e1, e2, e2), (e2, e1, e2, e3),
-                 (e2, e1, e3, e1), (e2, e1, e3, e2), (e2, e1, e3, e3),
-                 (e2, e2, e1, e1), (e2, e2, e1, e2), (e2, e2, e1, e3),
-                 (e2, e2, e2, e1), (e2, e2, e2, e2), (e2, e2, e2, e3),
-                 (e2, e2, e3, e1), (e2, e2, e3, e2), (e2, e2, e3, e3),
-                 (e2, e3, e1, e1), (e2, e3, e1, e2), (e2, e3, e1, e3),
-                 (e2, e3, e2, e1), (e2, e3, e2, e2), (e2, e3, e2, e3),
-                 (e2, e3, e3, e1), (e2, e3, e3, e2), (e2, e3, e3, e3),
-                 (e3, e1, e1, e1), (e3, e1, e1, e2), (e3, e1, e1, e3),
-                 (e3, e1, e2, e1), (e3, e1, e2, e2), (e3, e1, e2, e3),
-                 (e3, e1, e3, e1), (e3, e1, e3, e2), (e3, e1, e3, e3),
-                 (e3, e2, e1, e1), (e3, e2, e1, e2), (e3, e2, e1, e3),
-                 (e3, e2, e2, e1), (e3, e2, e2, e2), (e3, e2, e2, e3),
-                 (e3, e2, e3, e1), (e3, e2, e3, e2), (e3, e2, e3, e3),
-                 (e3, e3, e1, e1), (e3, e3, e1, e2), (e3, e3, e1, e3),
-                 (e3, e3, e2, e1), (e3, e3, e2, e2), (e3, e3, e2, e3),
-                 (e3, e3, e3, e1), (e3, e3, e3, e2), (e3, e3, e3, e3)]
+basis_vectors = list(itertools.product((e1, e2, e3), repeat=4))
 
 # Calculate the 81 canonical basis vectors of C^3\otimes4
 vectors = [kronecker_product_4(*vectors) for vectors in basis_vectors]
