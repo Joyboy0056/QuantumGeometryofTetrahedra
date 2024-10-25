@@ -16,10 +16,12 @@ def kronecker_product_4(v1, v2, v3, v4):
 
 # All combinations of (v1, v2) repeated 4 times
 # it spans a 16 dimensional vector space
-basis_vectors = [(e1, e1, e1, e1), (e1, e1, e1, e2), (e1, e1, e2, e1), (e1, e1, e2, e2),
-                 (e1, e2, e1, e1), (e1, e2, e1, e2), (e1, e2, e2, e1), (e1, e2, e2, e2),
-                 (e2, e1, e1, e1), (e2, e1, e1, e2), (e2, e1, e2, e1), (e2, e1, e2, e2),
-                 (e2, e2, e1, e1), (e2, e2, e1, e2), (e2, e2, e2, e1), (e2, e2, e2, e2)]
+#basis_vectors = [(e1, e1, e1, e1), (e1, e1, e1, e2), (e1, e1, e2, e1), (e1, e1, e2, e2),
+ #                (e1, e2, e1, e1), (e1, e2, e1, e2), (e1, e2, e2, e1), (e1, e2, e2, e2),
+  #               (e2, e1, e1, e1), (e2, e1, e1, e2), (e2, e1, e2, e1), (e2, e1, e2, e2),
+   #              (e2, e2, e1, e1), (e2, e2, e1, e2), (e2, e2, e2, e1), (e2, e2, e2, e2)]
+
+basis_vectors = list(itertools.product((e1, e2), repeat=4))
 
 # Calculate the 16 canonical basis vectors of C^2\otimes4
 vectors = [kronecker_product_4(*vectors) for vectors in basis_vectors]
