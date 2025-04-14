@@ -1,8 +1,7 @@
-from sympy import pprint, Add, Mul, S, symbols, Matrix, sympify
+from sympy import Add, Mul, S, Matrix
 from sympy.physics.quantum import Ket, TensorProduct
 
 import itertools
-import sympy as sp
 
 class Vspace:
     """
