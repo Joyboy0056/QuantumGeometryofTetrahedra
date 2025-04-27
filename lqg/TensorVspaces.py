@@ -4,11 +4,12 @@ from sympy.physics.quantum import Ket, TensorProduct
 import itertools
 
 class Vspace:
-    """
-    Inizializza uno spazio vettoriale con la sua base.
-    :param basis: lista di vettori SymPy che compongono la base.
-    """
+    """A class for a vector space"""
     def __init__(self, basis):
+        """
+            Inizialize a vector space with its basis.
+            :param basis: list of SymPy vectors for the basis.
+        """
         self.basis = basis
         self.dimension = len(basis)
 
@@ -22,8 +23,8 @@ class Vspace:
         self.elements_dict = {}
 
     def get_element(self, *coeffs):
-        """Restituisce la combinazione lineare dei vettori di base con i coefficienti dati
-            e registra la sua rappresentazione simbolica e vettoriale.
+        """Returns the linear combination of the basis vectors with the inpunt coefficients
+            and records both its symbolic and vectorial representation in the dict "self.elements_dict"
         """
         if len(coeffs) != self.dimension:
             raise ValueError("Il numero di coefficienti deve corrispondere alla dimensione dello spazio vettoriale.")
@@ -49,19 +50,20 @@ class Vspace:
 
 class TensorProductVspace:
     """
-    Classe per il prodotto tensoriale di k spazi vettoriali.
+    Class for the tensorial product of k vector spaces.
     """
 
     def __init__(self, *Vspaces):
         """
-            Ogni Vspace deve essere un oggetto della classe Vspace
+            Inizialize the tensor product space of k vector spaces.
+            :param Vspaces: Objects of the Vspace class above.
         """
         self.Vspaces = Vspaces
         self.k = len(Vspaces)  # Numero di fattori
         self.dimensions = [V.dimension for V in Vspaces]  # lista con le dimensioni dei fattori
-        self.total_dimension = 1
+        self.dimension = 1
         for dim in self.dimensions:
-            self.total_dimension *= dim  # dimensione del prodotto
+            self.dimension *= dim  # dimensione del prodotto
 
         self.bases = [V.basis for V in Vspaces]
         self.vec_bases = [V.vec_basis for V in Vspaces]
@@ -84,9 +86,7 @@ class TensorProductVspace:
     # def get_element(self, *coeffs):
     #    pass
 
-
-
-    def get_tensor_basis(self):
+    def get_tensor_basis(self): # Unused
         res = []
         for tuple in list(itertools.product(*self.bases)):
             res.append(TensorProduct(*tuple))
@@ -95,7 +95,8 @@ class TensorProductVspace:
 
 def pretty_ket(expr):
     """
-    Trasforma un'espressione composta da Ket, TensorProduct, o Add in Ket con etichetta '++-+'
+    Transforms an expression made of Ket, TensorProduct, Add or Mul in a single Ket
+    e.g. 2*|+> ⊗ |-> ⊗ 3*|+> ⊗ |-> = 6*|+-+->
     """
     if isinstance(expr, Ket):
         aux = ''
@@ -115,23 +116,25 @@ def pretty_ket(expr):
     elif isinstance(expr, Add):
         terms = []
         for term in expr.args:
-            coeff = S.One
-            ket_expr = term
-
-            if isinstance(term, Mul):
-                coeffs = [f for f in term.args if not isinstance(f, (Ket, TensorProduct))]
-                kets = [f for f in term.args if isinstance(f, (Ket, TensorProduct))]
-                if coeffs:
-                    coeff = Mul(*coeffs)
-                if kets:
-                    ket_expr = kets[0]
-
-            new_ket = pretty_ket(ket_expr)
-            if coeff == 1:
-                terms.append(new_ket)
-            else:
-                terms.append(coeff * new_ket)
+            terms.append(pretty_ket(term))
         return Add(*terms)
 
+    elif isinstance(expr, Mul):
+        coeff = S.One
+        ket_expr = None
+        for factor in expr.args:
+            if isinstance(factor, (Ket, TensorProduct)):
+                ket_expr = factor
+            else:
+                coeff *= factor
+        if ket_expr is None:
+            raise ValueError("Mul does not contain a Ket or TensorProduct.")
+        new_ket = pretty_ket(ket_expr)
+        if coeff == 1:
+            return new_ket
+        else:
+            return coeff * new_ket
+
     else:
-        raise TypeError("Input must be a Ket, TensorProduct, or Add of them.")
+        raise TypeError("Input must be a Ket, TensorProduct, Add or Mul of them.")
+
