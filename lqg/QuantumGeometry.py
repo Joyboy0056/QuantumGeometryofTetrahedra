@@ -1,6 +1,8 @@
+from soupsieve.pretty import pretty
+
 from TensorVspaces import Vspace, TensorProductVspace
 from sympy.physics.quantum import Ket, TensorProduct
-from sympy import I, Add, Mul, sqrt, symbols, Eq, solve, Matrix
+from sympy import I, Add, Mul, sqrt, S, simplify, expand, symbols, Eq, solve, Matrix
 
 from math import prod
 
@@ -98,7 +100,7 @@ class GroundState:
                 coeff, ket = (1, Ket(ket.args[0]))
             labels = [lab for lab in str(ket.label[0])]
 
-            single_ket = GroundState().tau(Ket(str(ket.args[0])[i]))[a-1]
+            single_ket = self.tau(Ket(str(ket.args[0])[i]))[a-1]
 
             if len(single_ket.args) == 1:
                 sket = single_ket.args[1]
@@ -126,7 +128,7 @@ class GroundState:
                     # print(coeff, ket)
                 labels = [lab for lab in str(ket.label[0])]
 
-                single_ket = GroundState().tau(Ket(str(ket.args[0])[i]))[a-1]
+                single_ket = self.tau(Ket(str(ket.args[0])[i]))[a-1]
 
                 if len(single_ket.args) == 1:
                     sket = single_ket.args[1]
@@ -234,7 +236,7 @@ class Spin1Tetrahedron:
     def tau(self, ket):
         if not isinstance(ket, Ket):
             raise TypeError("Input must be a Ket")
-        return [-I/2*res for res in self.Pauli(ket)]
+        return [simplify(-I/2*res) for res in self.Pauli(ket)]
 
     def lie_operator(self, indexes, ket):
         """Function for the action of the Lie operator L_(i,a) on a spinnet state
@@ -248,64 +250,55 @@ class Spin1Tetrahedron:
         elif i == 4:
             raise ValueError("The index 'i' ranges in {0,1,2,3}")
 
-        if isinstance(ket, Ket) or isinstance(ket, Mul):
-            res = Ket('')
-            if len(ket.args) > 1:
-                # ket.args could be (-1/2, I, |->)
-                coeff = prod(ket.args[:-1])  # Prodotto dei primi n-1 elementi
-                ket = ket.args[-1]
-            elif len(ket.args) == 1:
-                coeff, ket = (1, Ket(ket.args[0]))
-            labels = [lab for lab in str(ket.label[0])]
+        # Se ket è Add estendo linearmente
+        if isinstance(ket, Add):
+            return Add(*[self.lie_operator(indexes, term) for term in ket.args])
 
-            single_ket = GroundState().tau(Ket(str(ket.args[0])[i]))[a - 1]
-
-            if len(single_ket.args) == 1:
-                sket = single_ket.args[1]
-                labels[2] = sket.args[0]
-                res += coeff * Ket(f'{labels[0]}{labels[1]}{labels[2]}{labels[3]}{labels[4]}{labels[5]}{labels[6]}{labels[7]}')
-            elif len(single_ket.args) > 1:
-                coef = prod(single_ket.args[:-1])  # Prodotto dei primi n-1 elementi
-                sket = single_ket.args[-1]
-                labels[i] = sket.args[0]
-                res += coef * coeff * Ket(f'{labels[0]}{labels[1]}{labels[2]}{labels[3]}{labels[4]}{labels[5]}{labels[6]}{labels[7]}')
-
-
-        elif isinstance(ket, Add):
-            deeplist = [ket.args[j].args for j in range(len(ket.args))]
-            # deeplist is [(coeff, ket)] or [(ket,)]
-            res = Ket('')
-            for t in deeplist:
-                if len(t) > 1:
-                    coeff = prod(t[:-1])  # Prodotto dei primi n-1 elementi
-                    ket = t[-1]
-                    # print(coeff, ket)
-                elif len(t) == 1:
-                    coeff = 1
-                    ket = Ket(t[0])
-                    # print(coeff, ket)
-                labels = [lab for lab in str(ket.label[0])]
-
-                single_ket = GroundState().tau(Ket(str(ket.args[0])[i]))[a - 1]
-
-                if len(single_ket.args) == 1:
-                    sket = single_ket.args[1]
-                    print(sket)
-                    labels[2] = sket.args[0]
-                    res += coeff * Ket(f'{labels[0]}{labels[1]}{labels[2]}{labels[3]}{labels[4]}{labels[5]}{labels[6]}{labels[7]}')
-                elif len(single_ket.args) > 1:
-                    coef = prod(single_ket.args[:-1])  # Prodotto dei primi n-1 elementi
-                    sket = single_ket.args[-1]
-                    labels[i] = sket.args[0]
-                    res += coef * coeff * Ket(f'{labels[0]}{labels[1]}{labels[2]}{labels[3]}{labels[4]}{labels[5]}{labels[6]}{labels[7]}')
-
-        elif isinstance(ket, TensorProduct):
-            raise TypeError("If you wanna apply Lie ops to sympy.TensorProduct, please use 'pretty_ket' on it before.")
-
+        # Se ket è una moltiplicazione coefficiente * ket
+        coeff = S.One
+        true_ket = ket
+        if isinstance(ket, Mul):
+            for factor in ket.args:
+                if isinstance(factor, Ket):
+                    true_ket = factor
+                else:
+                    coeff *= factor
+        elif isinstance(ket, Ket):
+            true_ket = ket
         else:
-            raise ValueError("This function handles sympy.Ket, sympy.Mul or sympy.Add only.")
+            raise TypeError(f"Expected Ket or Mul of Ket, got {type(ket)}")
+        # Ora true_ket è sicuramente un Ket
 
-        return res - Ket('')
+        label = str(true_ket.label[0])  # <-- label corretto, senza fare str(ket.args[0])
+        # if len(label) % 2 != 0:
+        #     raise ValueError("Label must have even number of symbols to form pairs.")
+
+        pairs = [(label[j], label[j + 1]) for j in range(0, len(label), 2)]
+        pauli_action = self.Pauli(Ket(f'{pairs[i][0]}{pairs[i][1]}'))[a-1]
+
+        # Ricostruiamo il nuovo Ket usando il risultato della Pauli action
+        result = S.Zero
+        for term in pauli_action.args if isinstance(pauli_action, Add) else [pauli_action]:
+            if isinstance(term, Mul):
+                factors = term.args
+                local_coeff = S.One
+                local_ket = None
+                for factor in factors:
+                    if isinstance(factor, Ket):
+                        local_ket = factor
+                    else:
+                        local_coeff *= factor
+            else:
+                local_coeff = S.One
+                local_ket = term
+
+            label_term = str(local_ket.label[0])
+            new_pairs = list(pairs)
+            new_pairs[i] = (label_term[0], label_term[1])
+            new_label = ''.join([x + y for (x, y) in new_pairs])
+            result += local_coeff * Ket(new_label)
+        return simplify(expand(coeff * result))
+
 
     def dihedral(self, indixes, ket):
         """Function for dihedral operators on spinnet ground states

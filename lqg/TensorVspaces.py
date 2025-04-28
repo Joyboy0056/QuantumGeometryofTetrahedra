@@ -98,11 +98,17 @@ def pretty_ket(expr):
     Transforms an expression made of Ket, TensorProduct, Add or Mul in a single Ket
     e.g. 2*|+> ⊗ |-> ⊗ 3*|+> ⊗ |-> = 6*|+-+->
     """
+    if expr == S.Zero:
+        return S.Zero
+
     if isinstance(expr, Ket):
-        aux = ''
-        for single_ket in expr.args:
-            aux += f'{single_ket.label[0]}'
+        # If already a single Ket with the full string, just return it
+        if isinstance(expr.label[0], str):
+            return expr
+        # Otherwise, build the full string
+        aux = ''.join(single_ket.label[0] for single_ket in expr.args)
         return Ket(aux)
+
 
     elif isinstance(expr, TensorProduct):
         aux = ''
