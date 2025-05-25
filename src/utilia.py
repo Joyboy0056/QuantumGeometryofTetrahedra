@@ -3,7 +3,31 @@ from sympy.physics.quantum import Ket, TensorProduct
 from sympy import expand, symbols, solve, simplify, sqrt, Eq
 import itertools
 
+# ============== Classes ===============
 
+# Colors class
+class bcolors:
+    BLACK = "\033[30m"
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[94m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
+    BORDEAUX = "\033[38;5;52m"         # Bordeaux (scuro)
+    PURPLE = "\033[38;5;129m"          # Viola
+    MIDNIGHT_BLUE = "\033[38;5;17m"    # Blu notte
+    DARK_GREEN = "\033[38;5;22m"       # Verde scuro
+    DARK_GREY = "\033[90m"             # Grigio scuro
+    ORANGE = "\033[38;5;208m"          # Arancione
+    DARK_ORANGE = "\033[38;5;166m"     # Arancione scuro
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+    ENDC = "\033[0m"
+    ITALIC = "\033[3m"                 # Corsivo 
+
+
+# Vector spaces classes
 class Vspace:
     """A class for a vector space"""
     def __init__(self, basis):
@@ -46,7 +70,6 @@ class Vspace:
     #     """Restituisce il dizionario con tutte le rappresentazioni degli elementi generati."""
     #     return self.elements_dict
     # non serve, si aggiorna automaticamente con get_element(coeffs)
-
 
 
 class TensorProductVspace:
