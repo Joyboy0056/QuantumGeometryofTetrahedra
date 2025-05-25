@@ -1,6 +1,6 @@
 # Quantum Geometry of Tetrahedra
 
-You can find here a [little pdf](https://github.com/Joyboy0056/QuantumGeometryofTetrahedra/docs/Loop_Quantisation_of_Space.pdf) file where I tried to describe the scenario of quantum geometry of space, offered by the Loop Quantisation of Gravity (LQG), well discussed in  my master's thesis, as user-friendly as possible.
+You can find here a [little pdf](https://github.com/Joyboy0056/QuantumGeometryofTetrahedra/blob/main/docs/Loop_Quantisation_of_Space.pdf) file where I tried to describe the scenario of quantum geometry of space, offered by the Loop Quantisation of Gravity (LQG), well discussed in  my master's thesis, as user-friendly as possible.
 
 Thereafter, the quantum geometry of space is modeled by the theory in a discrete lattice made of spin tetrahedra and one is able to describe the quantum geometric properties of space as observables of the theory: they reduce to some self-adjoint operators among finite dimensional vector spaces with real spectra containing the possible outcomes of the measurements, in a perfect quantum flavor.
 
@@ -36,4 +36,4 @@ Everything lies within the framework of multilinear algebra and here you can fin
    - **Develop** a program to calculate gauge invariant operators and Lie operators in a multilinear algebra context.
 
 ## Fruibility
-You can mainly refer to the folder [lqg](https://github.com/Joyboy0056/QuantumGeometryofTetrahedra/tree/main/lqg), that's where you can find a comprehensible workflow of the theory of quantum spin $(j,j,j,j)$ tetrahedra. In particular, there you will spot my libraries on Kets and Quantum Operators for both the cases $j=\frac{1}{2}$ and $j=1$.
+You can mainly refer to the [source](https://github.com/Joyboy0056/QuantumGeometryofTetrahedra/tree/main/src) folder and the [main](https://github.com/Joyboy0056/QuantumGeometryofTetrahedra/blob/main/main.ipynb) notebook, that's where you can find a comprehensible workflow of the theory of quantum spin $(j,j,j,j)$ tetrahedra — cfr. [lqg-theory](https://github.com/Joyboy0056/QuantumGeometryofTetrahedra/blob/main/docs/Loop_Quantisation_of_Space.pdf). In particular, there you will spot attempts to apply my `lqg-classes` to the cases $j=\frac{1}{2}$, $j=1$ and forthcoming $j\geq\frac{3}{2}$.
