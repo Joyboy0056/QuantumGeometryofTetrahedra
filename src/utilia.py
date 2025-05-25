@@ -1,7 +1,8 @@
 from sympy import Add, Mul, S, Matrix
 from sympy.physics.quantum import Ket, TensorProduct
-
+from sympy import expand, symbols, solve, simplify, sqrt, Eq
 import itertools
+
 
 class Vspace:
     """A class for a vector space"""
@@ -93,10 +94,19 @@ class TensorProductVspace:
         return res
 
 
-def pretty_ket(expr):
+# =================== AUXs utilia ====================
+
+epsilon = {
+                ('+', '+'): 0,
+                ('-', '-'): 0,
+                ('+', '-'): 1,
+                ('-', '+'): -1
+            }
+
+def pket(expr):
     """
-    Transforms an expression made of Ket, TensorProduct, Add or Mul in a single Ket
-    e.g. 2*|+> ⊗ |-> ⊗ 3*|+> ⊗ |-> = 6*|+-+->
+    Pretty transforms an expression made of Ket, TensorProduct, Add or Mul in a single Ket
+    e.g. 2*|+⟩ ⊗ |-⟩ ⊗ 3*|+⟩ ⊗ |-⟩ = 6*|+-+-⟩
     """
     if expr == S.Zero:
         return S.Zero
@@ -122,7 +132,7 @@ def pretty_ket(expr):
     elif isinstance(expr, Add):
         terms = []
         for term in expr.args:
-            terms.append(pretty_ket(term))
+            terms.append(pket(term))
         return Add(*terms)
 
     elif isinstance(expr, Mul):
@@ -135,7 +145,7 @@ def pretty_ket(expr):
                 coeff *= factor
         if ket_expr is None:
             raise ValueError("Mul does not contain a Ket or TensorProduct.")
-        new_ket = pretty_ket(ket_expr)
+        new_ket = pket(ket_expr)
         if coeff == 1:
             return new_ket
         else:
@@ -143,4 +153,122 @@ def pretty_ket(expr):
 
     else:
         raise TypeError("Input must be a Ket, TensorProduct, Add or Mul of them.")
+    
 
+# Claude function for coefficients extraction
+def extract_coefficients(expr, basis_vectors):
+    """Extract coefficients when expressing expr as linear combination of basis_vectors
+    Returns coefficients c_i such that expr = Σ c_i * basis_vectors[i]
+    
+    Uses sympy's linear system solving for robust coefficient extraction.
+    """
+    if expr == S.Zero:
+        return [S.Zero] * len(basis_vectors)
+    
+    # Expand everything
+    expr = expand(expr)
+    basis_expanded = [expand(basis_vec) for basis_vec in basis_vectors]
+    
+    # Collect all unique ket terms from expression and basis vectors
+    all_kets = set()
+    
+    def collect_kets(expression):
+        if isinstance(expression, Add):
+            for term in expression.args:
+                if isinstance(term, Ket):
+                    all_kets.add(term)
+                elif isinstance(term, Mul):
+                    for factor in term.args:
+                        if isinstance(factor, Ket):
+                            all_kets.add(factor)
+        elif isinstance(expression, Ket):
+            all_kets.add(expression)
+        elif isinstance(expression, Mul):
+            for factor in expression.args:
+                if isinstance(factor, Ket):
+                    all_kets.add(factor)
+    
+    collect_kets(expr)
+    for basis_vec in basis_expanded:
+        collect_kets(basis_vec)
+    
+    all_kets = sorted(list(all_kets), key=str)
+    
+    if not all_kets:
+        return [S.Zero] * len(basis_vectors)
+    
+    # Create coefficient extraction function
+    def get_coeff_of_ket(expression, target_ket):
+        """Get coefficient of target_ket in expression"""
+        if expression == S.Zero:
+            return S.Zero
+        
+        expanded = expand(expression)
+        if isinstance(expanded, Add):
+            coeff = S.Zero
+            for term in expanded.args:
+                if isinstance(term, Ket) and term == target_ket:
+                    coeff += S.One
+                elif isinstance(term, Mul):
+                    ket_part = None
+                    coeff_part = S.One
+                    for factor in term.args:
+                        if isinstance(factor, Ket):
+                            ket_part = factor
+                        else:
+                            coeff_part *= factor
+                    if ket_part == target_ket:
+                        coeff += coeff_part
+            return coeff
+        elif isinstance(expanded, Ket) and expanded == target_ket:
+            return S.One
+        elif isinstance(expanded, Mul):
+            ket_part = None
+            coeff_part = S.One
+            for factor in expanded.args:
+                if isinstance(factor, Ket):
+                    ket_part = factor
+                else:
+                    coeff_part *= factor
+            if ket_part == target_ket:
+                return coeff_part
+        
+        return S.Zero
+    
+    # Set up linear system: expr = Σ c_i * basis_i
+    # For each ket k: coeff_of_k(expr) = Σ c_i * coeff_of_k(basis_i)
+    
+    n_basis = len(basis_vectors)
+    equations = []
+    coeffs = symbols([f'c_{i}' for i in range(n_basis)])
+    
+    for ket in all_kets:
+        expr_coeff = get_coeff_of_ket(expr, ket)
+        basis_coeffs = [get_coeff_of_ket(basis_expanded[i], ket) for i in range(n_basis)]
+        
+        # Skip if this ket doesn't appear anywhere
+        if expr_coeff == S.Zero and all(bc == S.Zero for bc in basis_coeffs):
+            continue
+        
+        # Build equation: expr_coeff = Σ c_i * basis_coeffs[i]
+        lhs = sum(coeffs[i] * basis_coeffs[i] for i in range(n_basis))
+        equations.append(Eq(lhs, expr_coeff))
+    
+    if not equations:
+        return [S.Zero] * len(basis_vectors)
+    
+    # Solve the linear system
+    try:
+        solution = solve(equations, coeffs)
+        if isinstance(solution, dict):
+            result = [simplify(solution.get(coeffs[i], S.Zero)) for i in range(n_basis)]
+        else:
+            # Handle case where solution is a list (parametric solutions)
+            result = [S.Zero] * n_basis
+            print(f"Warning: Could not find unique solution. Equations: {equations}")
+    except Exception as e:
+        print(f"Error solving linear system: {e}")
+        print(f"Equations: {equations}")
+        result = [S.Zero] * n_basis
+    
+    return result

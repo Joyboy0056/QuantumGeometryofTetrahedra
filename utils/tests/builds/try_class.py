@@ -1,4 +1,4 @@
-from TensorVspaces import Vspace, TensorProductVspace, pretty_ket
+from utilia import Vspace, TensorProductVspace, pretty_ket
 import sympy as sp
 
 from sympy import symbols, pprint
