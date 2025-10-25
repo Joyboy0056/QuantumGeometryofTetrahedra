@@ -11,3 +11,14 @@ class Spin3_2Tetrahedron:
         self.Vj4 = self.Vj1
         self.supp = TensorProductVspace(self.Vj1, self.Vj2, self.Vj3, self.Vj4)
         # Now it inherits all the attributes, instances and methods of a TensorProductVspace object
+
+
+
+# paste in a ipynb the following
+from sympy import pprint
+from src.utilia import pket
+from spin_jjjj_tetrahedra.spin_3half_3half_3half_3half_tetrahedron import Spin3_2Tetrahedron
+s4 = Spin3_2Tetrahedron()
+p_basis = [pket(vec) for vec in s4.supp.basis]
+pprint(p_basis)
+print(len(p_basis))
