@@ -15,10 +15,10 @@ class Spin3_2Tetrahedron:
 
 
 # paste in a ipynb the following
-from sympy import pprint
-from src.utilia import pket
-from spin_jjjj_tetrahedra.spin_3half_3half_3half_3half_tetrahedron import Spin3_2Tetrahedron
-s4 = Spin3_2Tetrahedron()
-p_basis = [pket(vec) for vec in s4.supp.basis]
-pprint(p_basis)
-print(len(p_basis))
+# from sympy import pprint
+# from src.utilia import pket
+# from spin_jjjj_tetrahedra.spin_3half_3half_3half_3half_tetrahedron import Spin3_2Tetrahedron
+# s4 = Spin3_2Tetrahedron()
+# p_basis = [pket(vec) for vec in s4.supp.basis]
+# pprint(p_basis)
+# print(len(p_basis))

@@ -70,26 +70,27 @@ class Spin1Tetrahedron:
         :param ket_symbol: '++', '+-', or '--' (corresponding to |1⟩, |0⟩, |-1⟩)
         :return: [L^1|ket⟩, L^2|ket⟩, L^3|ket⟩]
         """
-        if ket_symbol == '++':  # |1⟩ state
-            return [
-                (1/sqrt(2)) * sqrt(2)*Ket('+-'),     # L^1|++⟩ = (1/√2) * √2|+-⟩ = |+-⟩
-                (I/sqrt(2)) * (-sqrt(2)*Ket('+-')),  # L^2|++⟩ = (i/√2) * (-√2|+-⟩) = -i|+-⟩
-                Ket('++')                             # L^3|++⟩ = |++⟩
-            ]
-        elif ket_symbol == '+-' or ket_symbol == '-+':  # |0⟩ state  
-            return [
-                (1/sqrt(2)) * (Ket('++') + Ket('--')),    # L^1|+-⟩ = (1/√2) * (|++⟩ + |--⟩)
-                (I/sqrt(2)) * (Ket('++') - Ket('--')),    # L^2|+-⟩ = (i/√2) * (|++⟩ - |--⟩)
-                S.Zero                                     # L^3|+-⟩ = 0
-            ]
-        elif ket_symbol == '--':  # |-1⟩ state
-            return [
-                (1/sqrt(2)) * sqrt(2)*Ket('+-'),     # L^1|--⟩ = (1/√2) * √2|+-⟩ = |+-⟩
-                (I/sqrt(2)) * sqrt(2)*Ket('+-'),     # L^2|--⟩ = (i/√2) * √2|+-⟩ = i|+-⟩
-                -Ket('--')                            # L^3|--⟩ = -|--⟩
-            ]
-        else:
-            raise ValueError(f"Invalid ket symbol: {ket_symbol}")
+        match ket_symbol:
+            case '++':  # |1⟩ state
+                return [
+                    (1/sqrt(2)) * sqrt(2)*Ket('+-'),     # L^1|++⟩ = (1/√2) * √2|+-⟩ = |+-⟩
+                    (I/sqrt(2)) * (-sqrt(2)*Ket('+-')),  # L^2|++⟩ = (i/√2) * (-√2|+-⟩) = -i|+-⟩
+                    Ket('++')                             # L^3|++⟩ = |++⟩
+                ]
+            case '+-' | '-+':  # |0⟩ state  
+                return [
+                    (1/sqrt(2)) * (Ket('++') + Ket('--')),    # L^1|+-⟩ = (1/√2) * (|++⟩ + |--⟩)
+                    (I/sqrt(2)) * (Ket('++') - Ket('--')),    # L^2|+-⟩ = (i/√2) * (|++⟩ - |--⟩)
+                    S.Zero                                     # L^3|+-⟩ = 0
+                ]
+            case '--':  # |-1⟩ state
+                return [
+                    (1/sqrt(2)) * sqrt(2)*Ket('+-'),     # L^1|--⟩ = (1/√2) * √2|+-⟩ = |+-⟩
+                    (I/sqrt(2)) * sqrt(2)*Ket('+-'),     # L^2|--⟩ = (i/√2) * √2|+-⟩ = i|+-⟩
+                    -Ket('--')                            # L^3|--⟩ = -|--⟩
+                ]
+            case _:
+                raise ValueError(f"Invalid ket symbol: {ket_symbol}")
 
     def tau3D(self, ket_symbol):
         """Action of τᵢ = -i/2 Lᵢ matrices for j=1 representation"""
@@ -241,7 +242,7 @@ class Spin1Tetrahedron:
         
         # Extract coefficients: D_results[j] = Σᵢ M[i,j] * Inv[i]
         n = len(basis)
-        matrix_elements = Matrix.zeros(n, n)
+        matrix_elements: Matrix = Matrix.zeros(n, n)
         for j in range(n):  # for each result
             coeffs = extract_coefficients(D_results[j], basis_expanded)
             print(f"Coefficients for D_{{{alpha},{beta}}}|Inv_{j}⟩: {coeffs}")
@@ -257,7 +258,7 @@ class Spin1Tetrahedron:
     def volume_squared(self, coeff=2/9, basis=None):
         """Compute the volume squared operator c * |[D_{1,3}, D_{1,2}]|"""
         
-        def matrix_abs_elementwise(M):
+        def matrix_abs_elementwise(M: Matrix):
             """Apply |·| to each entry as |M|ij = |Mij|"""
             from sympy import Abs
             return M.applyfunc(Abs)
@@ -298,7 +299,7 @@ class Spin1Tetrahedron:
         new_basis_expanded = [expand(vec) for vec in new_basis]
         
         # Build change of basis matrix P: new_basis[i] = Σⱼ P[j,i] * old_basis[j]
-        P = Matrix.zeros(n, n)
+        P: Matrix = Matrix.zeros(n, n)
         for i in range(n):  # for each new basis vector
             coeffs = extract_coefficients(new_basis_expanded[i], old_basis_expanded)
             for j in range(n):  # coefficient of each old basis vector
@@ -306,7 +307,7 @@ class Spin1Tetrahedron:
         
         # Apply change of basis formula: M_new = P^(-1) * M_old * P
         P_inv = P.inv()
-        matrix_new = P_inv * matrix * P
+        matrix_new: Matrix = P_inv * matrix * P
         
         # Simplify and convert to symbolic form
         matrix_new = matrix_new.applyfunc(lambda x: nsimplify(simplify(x), rational=False))

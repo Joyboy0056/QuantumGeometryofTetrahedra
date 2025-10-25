@@ -1,8 +1,8 @@
 from src.utilia import *
 
-from src.spin_jjjj_tetrahedra.Spin1HalfTetrahedron import GroundState
-from src.spin_jjjj_tetrahedra.Spin1Tetrahedron import Spin1Tetrahedron
-from src.spin_jjjj_tetrahedra.Spin3HalfTetrahedron import Spin3_2Tetrahedron
+from spin_jjjj_tetrahedra.spin_1half_1half_1half_1half_tetrahedron import GroundState
+from spin_jjjj_tetrahedra.spin_1_1_1_1_tetrahedron import Spin1Tetrahedron
+from spin_jjjj_tetrahedra.spin_3half_3half_3half_3half_tetrahedron import Spin3_2Tetrahedron
 
 
 class SpinTetrahedron:
@@ -10,23 +10,19 @@ class SpinTetrahedron:
         """Inizialize a `wrapper` class for a general spin tetrahedron
             ρ = ρ^j1 ⊗ ρ^j2 ⊗ ρ^j3 ⊗ ρ^j4 : Spin(3) -> End(V_j1 ⊗ V_j2 ⊗ V_j3 ⊗ V_j4)
         """
-        if j1 == j2 == j3 == j4 == 1/2:
-            self.impl = GroundState()
-
-        elif j1 == j4 == 1 and j2 == j3 == 1/2:
-            self.impl = FirstExcitedState()
-
-        elif j1 == j2 == j3 == j4 == 1:
-            self.impl = Spin1Tetrahedron()
-
-        elif j1 == j4 == 3/2 and j2 == j3 == 1:
-            self.impl = ThirdExcitedState()
-
-        elif j1 == j2 == j3 == j4 == 3/2:
-            self.impl = Spin3_2Tetrahedron
-
-        else:
-            raise NotImplementedError(f"Spin values {j1},{j2},{j3},{j4} not yet covered.")
+        match (j1, j2, j3, j4): 
+            case (1/2, 1/2, 1/2, 1/2):
+                self.impl = GroundState()
+            case (1, 1/2, 1/2, 1):
+                self.impl = FirstExcitedState()
+            case (1, 1, 1, 1):    
+                self.impl = Spin1Tetrahedron()
+            case (3/2, 1, 1, 3/2):
+                self.impl = ThirdExcitedState()
+            case (3/2, 3/2, 3/2, 3/2):
+                self.impl = Spin3_2Tetrahedron
+            case _:
+                raise NotImplementedError(f"Spin values {j1},{j2},{j3},{j4} not yet covered.")
 
     def __getattr__(self, name):
         """Delegate all the attributes and methods to the actual wrapped class"""

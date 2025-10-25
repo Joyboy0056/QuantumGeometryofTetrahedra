@@ -45,12 +45,13 @@ class GroundState:
         :param ket_symbol: '+' or '-' character
         :return: [σ₁|ket⟩, σ₂|ket⟩, σ₃|ket⟩]
         """
-        if ket_symbol == '+':
-            return [Ket('-'), I*Ket('-'), Ket('+')]
-        elif ket_symbol == '-':
-            return [Ket('+'), -I*Ket('+'), -Ket('-')]
-        else:
-            raise ValueError(f"Invalid ket symbol: {ket_symbol}")
+        match ket_symbol:
+            case '+':
+               return [Ket('-'), I*Ket('-'), Ket('+')]
+            case '-':
+                return [Ket('+'), -I*Ket('+'), -Ket('-')]
+            case _:
+                raise ValueError(f"Invalid ket symbol: {ket_symbol}")
 
 
     def tau(self, ket_symbol):
